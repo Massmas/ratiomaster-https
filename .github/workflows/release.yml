@@ -1,0 +1,42 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: msbuild RatioMaster/RatioMaster.csproj /t:Restore /v:minimal
+
+      - name: Build Release
+        run: msbuild RatioMaster/RatioMaster.csproj /p:Configuration=Release /t:Build /v:minimal
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: RatioMaster HTTPS ${{ github.ref_name }}
+          body: |
+            ## RatioMaster HTTPS ${{ github.ref_name }}
+
+            Fork of [sergiye/RatioMaster](https://github.com/sergiye/RatioMaster) with native HTTPS tracker support.
+
+            ### Changes
+            - Native HTTPS support via SslStream (fixes Cloudflare-protected trackers)
+            - Seeding starts regardless of peer list in tracker response
+
+            ### Install
+            Download `RatioMaster.exe` below and run it directly — no installation needed.
+          files: RatioMaster/bin/RatioMaster.exe
+          draft: false
+          prerelease: false

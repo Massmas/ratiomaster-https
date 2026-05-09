@@ -777,6 +777,7 @@ namespace RatioMaster {
             }
           }
           else {
+            haveInitialPeers = true;
             foreach (string key in trackerResponse.Dict.Keys) {
               if (key != "failure reason" && key != "peers") {
                 AddLogLine(key + ": " + BEncode.String(trackerResponse.Dict[key]));
