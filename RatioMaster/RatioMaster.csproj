@@ -13,6 +13,7 @@
     <Optimize>true</Optimize>
     <DebugType>None</DebugType>
     <OutputPath>bin\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Deterministic>false</Deterministic>
   </PropertyGroup>
 
