@@ -1,0 +1,183 @@
+<Window x:Class="RatioMaster.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RatioMaster"
+        Title="RatioMaster"
+        Width="680" Height="780"
+        MinWidth="620" MinHeight="600"
+        Background="{DynamicResource BgBrush}"
+        AllowDrop="True"
+        Drop="Window_DragDrop"
+        DragEnter="Window_DragEnter"
+        Closing="Window_Closing"
+        StateChanged="Window_StateChanged">
+
+  <Window.Resources>
+    <!-- Card border style -->
+    <Style x:Key="CardBorder" TargetType="Border">
+      <Setter Property="Background"       Value="{DynamicResource PanelBrush}" />
+      <Setter Property="BorderBrush"      Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness"  Value="1" />
+      <Setter Property="CornerRadius"     Value="7" />
+      <Setter Property="Padding"          Value="12,10" />
+      <Setter Property="Margin"           Value="0,0,0,4" />
+    </Style>
+    <Style x:Key="CardTitle" TargetType="TextBlock">
+      <Setter Property="FontSize"         Value="10" />
+      <Setter Property="FontWeight"       Value="Bold" />
+      <Setter Property="Foreground"       Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Margin"           Value="0,0,0,8" />
+    </Style>
+    <Style x:Key="ThemeBtn" TargetType="Button">
+      <Setter Property="Background"    Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground"    Value="#80FFFFFF" />
+      <Setter Property="FontSize"      Value="14" />
+      <Setter Property="Padding"       Value="6,2" />
+      <Setter Property="Cursor"        Value="Hand" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="12"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#33FFFFFF" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />  <!-- Title bar -->
+      <RowDefinition Height="Auto" />  <!-- Menu bar -->
+      <RowDefinition Height="Auto" />  <!-- Tab bar header -->
+      <RowDefinition Height="*" />     <!-- Tab content -->
+      <RowDefinition Height="Auto" />  <!-- Bottom status bar (global) -->
+    </Grid.RowDefinitions>
+
+    <!-- ── Title bar ── -->
+    <Border Grid.Row="0" Background="{DynamicResource TitlebarBrush}" Padding="14,6">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />  <!-- icon + title -->
+          <ColumnDefinition Width="*" />     <!-- action buttons (centre) -->
+          <ColumnDefinition Width="Auto" />  <!-- theme + IP -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: icon + title -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <Border Width="22" Height="22" Background="#444444" CornerRadius="4" Margin="0,0,8,0">
+            <TextBlock Text="R" Foreground="White" FontWeight="Bold" FontSize="12"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <TextBlock Text="RatioMaster" Foreground="#C0C0C0" FontSize="13" FontWeight="SemiBold"
+                     VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Centre: START / STOP / Update / Defaults
+             Viewbox StretchDirection=DownOnly → scale automatique si fenêtre trop petite -->
+        <Viewbox Grid.Column="1"
+                 Stretch="Uniform"
+                 StretchDirection="DownOnly"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Margin="8,0">
+          <StackPanel Orientation="Horizontal">
+            <Button x:Name="tbStart"   Content="▶  START"   Style="{DynamicResource BtnStart}"
+                    Padding="18,7" FontSize="12" Margin="0,0,5,0" Click="TbStart_Click" />
+            <Button x:Name="tbStop"    Content="■  STOP"    Style="{DynamicResource BtnStop}"
+                    Padding="18,7" FontSize="12" Margin="0,0,5,0" IsEnabled="False" Click="TbStop_Click" />
+            <Button x:Name="tbUpdate"  Content="↻  Update"  Style="{DynamicResource BtnUpdate}"
+                    Padding="14,7" FontSize="12" Margin="0,0,5,0" IsEnabled="False" Click="TbUpdate_Click" />
+            <Button x:Name="tbDefault" Content="Defaults"   Style="{DynamicResource BtnGray}"
+                    Padding="14,7" FontSize="12" Click="TbDefault_Click" />
+          </StackPanel>
+        </Viewbox>
+
+        <!-- Right: theme toggle + IP label -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+          <Border Background="#22FFFFFF" CornerRadius="14" Padding="3" Margin="0,0,12,0">
+            <StackPanel Orientation="Horizontal">
+              <Button x:Name="btnDarkTheme"  Content="🌙" Style="{StaticResource ThemeBtn}"
+                      ToolTip="Dark theme"  Click="btnDarkTheme_Click"  Foreground="White" />
+              <Button x:Name="btnLightTheme" Content="☀️" Style="{StaticResource ThemeBtn}"
+                      ToolTip="Light theme" Click="btnLightTheme_Click" />
+            </StackPanel>
+          </Border>
+          <TextBlock x:Name="lblIp" Text="IP: ..." Foreground="#707070" FontSize="11"
+                     VerticalAlignment="Center" Margin="0,0,6,0" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ── Menu bar ── -->
+    <Menu Grid.Row="1" Background="{DynamicResource PanelBrush}"
+          BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+      <MenuItem Header="File">
+        <MenuItem Header="New tab"                    Click="NewTab_Click" />
+        <MenuItem Header="Remove current tab"         Click="RemoveTab_Click" />
+        <MenuItem Header="Rename current tab"         Click="RenameTab_Click" />
+        <Separator />
+        <MenuItem Header="Exit"                       Click="Exit_Click" />
+      </MenuItem>
+      <MenuItem Header="Sessions">
+        <MenuItem Header="Save current session"       Click="SaveSession_Click" />
+        <MenuItem Header="Save and stop session"      Click="SaveStopSession_Click" />
+        <Separator />
+        <MenuItem Header="Load session"               Click="LoadSession_Click" />
+        <MenuItem Header="Load and start session"     Click="LoadStartSession_Click" />
+      </MenuItem>
+      <MenuItem Header="Current">
+        <MenuItem Header="Start"                      Click="MenuStart_Click" />
+        <MenuItem Header="Manual update"              Click="MenuUpdate_Click" />
+        <MenuItem Header="Stop"                       Click="MenuStop_Click" />
+        <Separator />
+        <MenuItem Header="Save settings"              Click="MenuSaveSettings_Click" />
+      </MenuItem>
+      <MenuItem Header="All tabs">
+        <MenuItem Header="Start all"                  Click="StartAll_Click" />
+        <MenuItem Header="Update all"                 Click="UpdateAll_Click" />
+        <MenuItem Header="Stop all"                   Click="StopAll_Click" />
+        <Separator />
+        <MenuItem Header="Set upload speed for all…"  Click="SetAllUpload_Click" />
+        <MenuItem Header="Set download speed for all…" Click="SetAllDownload_Click" />
+      </MenuItem>
+      <MenuItem Header="Options">
+        <MenuItem x:Name="menuEnable24h" Header="24h time format" IsCheckable="True"
+                  Click="Enable24h_Click" />
+        <MenuItem x:Name="menuMinimizeToTray" Header="Minimize to tray" IsCheckable="True"
+                  IsChecked="True" />
+        <MenuItem x:Name="menuCloseToTray" Header="Close to tray" IsCheckable="True"
+                  IsChecked="True" />
+        <MenuItem x:Name="menuShowBalloon" Header="Show tray balloon" IsCheckable="True" />
+      </MenuItem>
+    </Menu>
+
+    <!-- ── Tab control ── -->
+    <TabControl x:Name="tabControl" Grid.Row="2" Grid.RowSpan="2"
+                Background="{DynamicResource BgBrush}"
+                BorderThickness="0"
+                Padding="0">
+      <!-- Tabs are added dynamically in code -->
+    </TabControl>
+
+    <!-- ── Bottom global status ── -->
+    <Border Grid.Row="4" Background="{DynamicResource PanelBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+            Padding="12,4">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock Foreground="{DynamicResource MutedBrush}" Text="Tabs: " FontSize="11" />
+        <TextBlock x:Name="lblTabs" Foreground="{DynamicResource TextBrush}" Text="0" FontSize="11" Margin="0,0,12,0" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

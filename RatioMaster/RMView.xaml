@@ -1,0 +1,448 @@
+<UserControl x:Class="RatioMaster.RMView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BgBrush}"
+             AllowDrop="True"
+             Drop="UserControl_Drop"
+             DragEnter="UserControl_DragEnter">
+
+  <UserControl.Resources>
+    <Style x:Key="CardBorder" TargetType="Border">
+      <Setter Property="Background"      Value="{DynamicResource PanelBrush}" />
+      <Setter Property="BorderBrush"     Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="7" />
+      <Setter Property="Padding"         Value="12,10" />
+      <Setter Property="Margin"          Value="0,0,0,6" />
+    </Style>
+    <Style x:Key="CardTitle" TargetType="TextBlock">
+      <Setter Property="FontSize"    Value="10" />
+      <Setter Property="FontWeight"  Value="Bold" />
+      <Setter Property="Foreground"  Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Margin"      Value="0,0,0,8" />
+    </Style>
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+      <Setter Property="Foreground"        Value="{DynamicResource MutedBrush}" />
+      <Setter Property="FontSize"          Value="12" />
+      <Setter Property="MinWidth"          Value="110" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="SmallLabel" TargetType="TextBlock">
+      <Setter Property="Foreground"        Value="{DynamicResource MutedBrush}" />
+      <Setter Property="FontSize"          Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin"            Value="4,0" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />  <!-- Status bar -->
+    </Grid.RowDefinitions>
+
+    <!-- ══════════════════════════════════════════════
+         Tab control — fills all available height
+         ══════════════════════════════════════════════ -->
+    <TabControl x:Name="tabControl" Grid.Row="0" Margin="10,8,10,4">
+
+      <!-- ═══════════ MAIN TAB ═══════════ -->
+      <TabItem Header="Main">
+        <!--
+          Two-row Grid:
+            Row 0 (Auto + MaxHeight): scrollable cards + buttons
+            Row 1 (*): log window — grows/shrinks with the window
+        -->
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="80" />
+          </Grid.RowDefinitions>
+
+          <!-- ── Cards + buttons (scrollable, capped height) ── -->
+          <ScrollViewer Grid.Row="0"
+                        MaxHeight="430"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="2,6,2,4">
+
+              <!-- Card: Torrent File -->
+              <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                  <TextBlock Text="TORRENT FILE" Style="{StaticResource CardTitle}" />
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="browseButton" Grid.Column="0" Content="Browse…"
+                            Style="{DynamicResource BtnGray}" Padding="12,5" Margin="0,0,8,0"
+                            Click="browseButton_Click" />
+                    <TextBox x:Name="torrentFile" Grid.Column="1" IsReadOnly="True"
+                             FontFamily="Consolas" FontSize="11"
+                             ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- Card: Torrent Info -->
+              <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                  <TextBlock Text="TORRENT INFO" Style="{StaticResource CardTitle}" />
+
+                  <!-- Tracker -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Tracker:" Style="{StaticResource FieldLabel}" />
+                    <TextBox x:Name="trackerAddress" Grid.Column="1" FontFamily="Consolas" FontSize="11" />
+                  </Grid>
+
+                  <!-- Hash -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Info hash:" Style="{StaticResource FieldLabel}" />
+                    <TextBox x:Name="shaHash" Grid.Column="1" FontFamily="Consolas" FontSize="11" />
+                  </Grid>
+
+                  <!-- Torrent Size + Finished -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="70" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Torrent size:"  Style="{StaticResource FieldLabel}" />
+                    <TextBox   x:Name="txtTorrentSize" Grid.Column="1" IsReadOnly="True" />
+                    <TextBlock Grid.Column="2" Text="Finished (%):" Style="{StaticResource SmallLabel}" Margin="10,0,6,0" />
+                    <TextBox   x:Name="fileSize" Grid.Column="3" Text="100" />
+                  </Grid>
+
+                  <!-- Client + Version -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="140" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Client:" Style="{StaticResource FieldLabel}" />
+                    <ComboBox x:Name="cmbClient" Grid.Column="1"
+                              SelectionChanged="cmbClient_SelectedIndexChanged">
+                      <ComboBoxItem>uTorrent</ComboBoxItem>
+                      <ComboBoxItem>BitTorrent</ComboBoxItem>
+                      <ComboBoxItem>BitComet</ComboBoxItem>
+                      <ComboBoxItem>Vuze</ComboBoxItem>
+                      <ComboBoxItem>Azureus</ComboBoxItem>
+                      <ComboBoxItem>Transmission</ComboBoxItem>
+                      <ComboBoxItem>BitLord</ComboBoxItem>
+                      <ComboBoxItem>Deluge</ComboBoxItem>
+                      <ComboBoxItem>KTorrent</ComboBoxItem>
+                      <ComboBoxItem>BitSpirit</ComboBoxItem>
+                      <ComboBoxItem>BitTyrant</ComboBoxItem>
+                      <ComboBoxItem>Burst</ComboBoxItem>
+                      <ComboBoxItem>BitTornado</ComboBoxItem>
+                      <ComboBoxItem>BTuga</ComboBoxItem>
+                      <ComboBoxItem>ABC</ComboBoxItem>
+                      <ComboBoxItem>Gnome BT</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Grid.Column="2" Text="Version:" Style="{StaticResource SmallLabel}" Margin="10,0,6,0" />
+                    <ComboBox x:Name="cmbVersion" Grid.Column="3"
+                              SelectionChanged="cmbVersion_SelectedValueChanged" />
+                  </Grid>
+
+                  <!-- Interval -->
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="80" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Interval (s):" Style="{StaticResource FieldLabel}" />
+                    <TextBox x:Name="interval" Grid.Column="1" Text="1800" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- Card: Speed Options -->
+              <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                  <TextBlock Text="SPEED OPTIONS" Style="{StaticResource CardTitle}" />
+
+                  <!-- Upload row -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="75" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Upload (kB/s):"   Style="{StaticResource FieldLabel}" />
+                    <TextBox   x:Name="uploadRate" Grid.Column="1" Text="50" TextChanged="uploadRate_TextChanged" />
+                    <CheckBox  x:Name="chkRandUP"  Grid.Column="2" Content="± rand" Margin="8,0,4,0" IsChecked="True" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                      <TextBox x:Name="txtRandUpMin"  Width="60" Text="1" />
+                      <TextBlock Text="–" Style="{StaticResource SmallLabel}" />
+                      <TextBox x:Name="txtRandUpMax"  Width="60" Text="10" />
+                      <TextBlock Text="kB/s" Style="{StaticResource SmallLabel}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <!-- Download row -->
+                  <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="75" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Download (kB/s):" Style="{StaticResource FieldLabel}" />
+                    <TextBox   x:Name="downloadRate" Grid.Column="1" Text="10" TextChanged="downloadRate_TextChanged" />
+                    <CheckBox  x:Name="chkRandDown"  Grid.Column="2" Content="± rand" Margin="8,0,4,0" IsChecked="True" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                      <TextBox x:Name="txtRandDownMin" Width="60" Text="1" />
+                      <TextBlock Text="–" Style="{StaticResource SmallLabel}" />
+                      <TextBox x:Name="txtRandDownMax" Width="60" Text="10" />
+                      <TextBlock Text="kB/s" Style="{StaticResource SmallLabel}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <!-- Sub-separator -->
+                  <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,0,0,8" />
+                  <TextBlock Text="RANDOMISE ON NEXT ANNOUNCE" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+
+                  <!-- Random next upload -->
+                  <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox x:Name="checkRandomUpload" Grid.Column="0" Content="Upload"   Margin="0,0,8,0" />
+                    <TextBlock Grid.Column="1" Text="Range (kB/s):" Style="{StaticResource SmallLabel}" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                      <TextBox x:Name="RandomUploadFrom" Width="60" Text="10" />
+                      <TextBlock Text="–" Style="{StaticResource SmallLabel}" />
+                      <TextBox x:Name="RandomUploadTo"   Width="60" Text="50" />
+                    </StackPanel>
+                  </Grid>
+
+                  <!-- Random next download -->
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="110" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox x:Name="checkRandomDownload" Grid.Column="0" Content="Download" Margin="0,0,8,0" />
+                    <TextBlock Grid.Column="1" Text="Range (kB/s):" Style="{StaticResource SmallLabel}" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                      <TextBox x:Name="RandomDownloadFrom" Width="60" Text="10" />
+                      <TextBlock Text="–" Style="{StaticResource SmallLabel}" />
+                      <TextBox x:Name="RandomDownloadTo"   Width="60" Text="100" />
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- Card: Options -->
+              <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                  <TextBlock Text="OPTIONS" Style="{StaticResource CardTitle}" />
+
+                  <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <CheckBox x:Name="checkRequestScrap"        Content="Request scrape"       IsChecked="True" Margin="0,0,20,0" />
+                    <CheckBox x:Name="checkTCPListen"           Content="TCP listen"           IsChecked="True" Margin="0,0,20,0" />
+                    <CheckBox x:Name="checkIgnoreFailureReason" Content="Ignore tracker errors" />
+                  </StackPanel>
+
+                  <!-- Stop after -->
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="160" />
+                      <ColumnDefinition Width="80" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Stop after:" Style="{StaticResource FieldLabel}" MinWidth="80" />
+                    <ComboBox x:Name="cmbStopAfter" Grid.Column="1"
+                              SelectionChanged="cmbStopAfter_SelectedIndexChanged">
+                      <ComboBoxItem>Never</ComboBoxItem>
+                      <ComboBoxItem>After time:</ComboBoxItem>
+                      <ComboBoxItem>When seeders &lt;</ComboBoxItem>
+                      <ComboBoxItem>When leechers &lt;</ComboBoxItem>
+                      <ComboBoxItem>When uploaded &gt;</ComboBoxItem>
+                      <ComboBoxItem>When downloaded &gt;</ComboBoxItem>
+                      <ComboBoxItem>When leechers/seeders &lt;</ComboBoxItem>
+                    </ComboBox>
+                    <TextBox  x:Name="txtStopValue"  Grid.Column="2" Text="0" Margin="6,0,0,0" Visibility="Collapsed" />
+                    <TextBlock x:Name="lblStopAfter" Grid.Column="3" Text="" Style="{StaticResource SmallLabel}" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- Action buttons are now in the MainWindow title bar.
+                   Keep controls here (Collapsed) so x:Name references in code-behind still compile. -->
+              <StackPanel Visibility="Collapsed">
+                <Button x:Name="StartButton"        Click="StartButton_Click" />
+                <Button x:Name="StopButton"         Click="StopButton_Click"         IsEnabled="False" />
+                <Button x:Name="manualUpdateButton" Click="manualUpdateButton_Click" IsEnabled="False" />
+                <Button x:Name="btnDefault"         Click="btnDefault_Click" />
+              </StackPanel>
+
+            </StackPanel>
+          </ScrollViewer>
+
+          <!-- ── Log window — fills all remaining height ── -->
+          <Border Grid.Row="1"
+                  Background="{DynamicResource LogBgBrush}"
+                  CornerRadius="6"
+                  Margin="2,2,2,4">
+            <RichTextBox x:Name="logWindow"
+                         Style="{DynamicResource LogStyle}"
+                         IsReadOnly="True" />
+          </Border>
+
+        </Grid>
+      </TabItem>
+
+      <!-- ═══════════ ADVANCED TAB ═══════════ -->
+      <TabItem Header="Advanced">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,6,0,0">
+          <StackPanel Margin="2,0">
+
+            <!-- Card: Custom Values -->
+            <Border Style="{StaticResource CardBorder}">
+              <StackPanel>
+                <TextBlock Text="CUSTOM VALUES" Style="{StaticResource CardTitle}" />
+
+                <CheckBox x:Name="chkNewValues" Content="Generate new values on client change"
+                          IsChecked="True" Margin="0,0,0,8"
+                          Checked="chkNewValues_Changed" Unchecked="chkNewValues_Changed" />
+
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Key:"     Style="{StaticResource FieldLabel}" />
+                  <TextBox   x:Name="customKey"    Grid.Column="1" FontFamily="Consolas" FontSize="11" />
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Peer ID:" Style="{StaticResource FieldLabel}" />
+                  <TextBox   x:Name="customPeerID" Grid.Column="1" FontFamily="Consolas" FontSize="11" />
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Port:"  Style="{StaticResource FieldLabel}" />
+                  <TextBox   x:Name="customPort"     Grid.Column="1" />
+                  <TextBlock Grid.Column="2" Text="Peers:" Style="{StaticResource SmallLabel}" Margin="12,0,6,0" />
+                  <TextBox   x:Name="customPeersNum" Grid.Column="3" />
+                </Grid>
+
+                <TextBlock x:Name="lblGenStatus" Text="Generation status: ready"
+                           Foreground="{DynamicResource MutedBrush}" FontSize="11"
+                           FontStyle="Italic" Margin="0,4,0,0" />
+              </StackPanel>
+            </Border>
+
+            <!-- Card: Proxy -->
+            <Border Style="{StaticResource CardBorder}">
+              <StackPanel>
+                <TextBlock Text="PROXY" Style="{StaticResource CardTitle}" />
+
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="150" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Type:" Style="{StaticResource FieldLabel}" />
+                  <ComboBox x:Name="comboProxyType" Grid.Column="1">
+                    <ComboBoxItem>None</ComboBoxItem>
+                    <ComboBoxItem>HTTP</ComboBoxItem>
+                    <ComboBoxItem>SOCKS4</ComboBoxItem>
+                    <ComboBoxItem>SOCKS4a</ComboBoxItem>
+                    <ComboBoxItem>SOCKS5</ComboBoxItem>
+                  </ComboBox>
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="80" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Host:" Style="{StaticResource FieldLabel}" />
+                  <TextBox   x:Name="textProxyHost" Grid.Column="1" />
+                  <TextBlock Grid.Column="2" Text="Port:" Style="{StaticResource SmallLabel}" Margin="8,0,6,0" />
+                  <TextBox   x:Name="textProxyPort" Grid.Column="3" />
+                </Grid>
+
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="User:" Style="{StaticResource FieldLabel}" />
+                  <TextBox   x:Name="textProxyUser" Grid.Column="1" />
+                  <TextBlock Grid.Column="2" Text="Pass:" Style="{StaticResource SmallLabel}" Margin="8,0,6,0" />
+                  <TextBox   x:Name="textProxyPass" Grid.Column="3" />
+                </Grid>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+    </TabControl>
+
+    <!-- ── Status bar ── -->
+    <Border Grid.Row="1" Background="{DynamicResource StatusBgBrush}" Padding="10,5" MinHeight="28">
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Foreground="#808080" Text="↑ "       FontSize="11" />
+        <TextBlock x:Name="uploadCount"    Foreground="#C8C8C8" Text="0 bytes"  FontSize="11" FontFamily="Consolas" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock Foreground="#808080" Text="↓ "       FontSize="11" />
+        <TextBlock x:Name="downloadCount"  Foreground="#C8C8C8" Text="0 bytes"  FontSize="11" FontFamily="Consolas" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock Foreground="#808080" Text="Ratio: "  FontSize="11" />
+        <TextBlock x:Name="lblTorrentRatio" Foreground="#C8C8C8" Text="NaN"    FontSize="11" FontFamily="Consolas" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock x:Name="seedLabel"   Foreground="#78C87A" Text="Seeds: –"   FontSize="11" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock x:Name="leechLabel"  Foreground="#C8C87A" Text="Peers: –"   FontSize="11" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock Foreground="#808080" Text="⏱ "       FontSize="11" />
+        <TextBlock x:Name="lblTotalTime" Foreground="#C8C8C8" Text="00:00"     FontSize="11" FontFamily="Consolas" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock Foreground="#808080" Text="Next: "   FontSize="11" />
+        <TextBlock x:Name="timerValue"  Foreground="#C8C8C8" Text="stopped"    FontSize="11" FontFamily="Consolas" />
+        <TextBlock Foreground="#505050" Text=" │ "      FontSize="11" Margin="4,0" />
+        <TextBlock x:Name="txtRemTime"  Foreground="#888888" Text=""           FontSize="11" FontFamily="Consolas" />
+      </WrapPanel>
+    </Border>
+
+  </Grid>
+</UserControl>

@@ -1,0 +1,27 @@
+<Window x:Class="RatioMaster.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RatioMaster"
+        Width="360" Height="150"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource PanelBrush}"
+        ShowInTaskbar="False">
+  <Grid Margin="16,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="8" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <TextBlock x:Name="lblPrompt" Grid.Row="0" Text="Enter value:" Foreground="{DynamicResource MutedBrush}" />
+    <TextBox   x:Name="txtInput"  Grid.Row="2" />
+    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button x:Name="btnOk" Content="OK" Style="{DynamicResource BtnUpdate}" Width="72"
+              IsDefault="True" Click="btnOk_Click" />
+      <Button Content="Cancel" Style="{DynamicResource BtnGray}" Width="72" Margin="8,0,0,0"
+              IsCancel="True" Click="btnCancel_Click" />
+    </StackPanel>
+  </Grid>
+</Window>
