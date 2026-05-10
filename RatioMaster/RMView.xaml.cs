@@ -581,6 +581,7 @@ namespace RatioMaster {
     private bool SendEventToTracker(TorrentInfo torrentInfo, string eventType) {
       scrapStatsUpdated = false;
       currentTorrent = torrentInfo;
+      bool ignoreFailure = Dispatcher.Invoke(() => checkIgnoreFailureReason.IsChecked == true);
       var urlString = GetUrlString(torrentInfo, eventType);
       try {
         var uri = new Uri(urlString);
@@ -590,7 +591,7 @@ namespace RatioMaster {
           var failure = BEncode.String(dict["failure reason"]);
           if (failure.Length > 0) {
             AddLogLine("Tracker Error: " + failure);
-            if (checkIgnoreFailureReason.IsChecked != true) {
+            if (!ignoreFailure) {
               StopButton_Click(null, null);
               AddLogLine("Stopped because of tracker error!!!");
               return false;
@@ -713,7 +714,8 @@ namespace RatioMaster {
 
     private void RequestScrapeFromTracker(TorrentInfo info) {
       Seeders = -1; Leechers = -1;
-      if (checkRequestScrap.IsChecked != true || scrapStatsUpdated) return;
+      bool doScrape = Dispatcher.Invoke(() => checkRequestScrap.IsChecked == true);
+      if (!doScrape || scrapStatsUpdated) return;
       try {
         var text1 = GetScrapeUrlString(info);
         if (text1 == "") { AddLogLine("This tracker doesn't seem to support scrape"); }
@@ -871,12 +873,18 @@ namespace RatioMaster {
 
     internal void RandomiseSpeeds() {
       try {
-        if (checkRandomUpload.IsChecked == true) {
-          _nextAnnounceUploadRate = RandomSp(RandomUploadFrom.Text, RandomUploadTo.Text, true);
+        bool   randUp   = Dispatcher.Invoke(() => checkRandomUpload.IsChecked   == true);
+        bool   randDown = Dispatcher.Invoke(() => checkRandomDownload.IsChecked == true);
+        string upFrom   = Dispatcher.Invoke(() => RandomUploadFrom.Text);
+        string upTo     = Dispatcher.Invoke(() => RandomUploadTo.Text);
+        string downFrom = Dispatcher.Invoke(() => RandomDownloadFrom.Text);
+        string downTo   = Dispatcher.Invoke(() => RandomDownloadTo.Text);
+        if (randUp) {
+          _nextAnnounceUploadRate = RandomSp(upFrom, upTo, true);
           AddLogLine("Next announce upload (random): " + _nextAnnounceUploadRate / 1024 + " kB/s");
         }
-        if (checkRandomDownload.IsChecked == true) {
-          _nextAnnounceDownloadRate = RandomSp(RandomDownloadFrom.Text, RandomDownloadTo.Text, true);
+        if (randDown) {
+          _nextAnnounceDownloadRate = RandomSp(downFrom, downTo, true);
           AddLogLine("Next announce download (random): " + _nextAnnounceDownloadRate / 1024 + " kB/s");
         }
       } catch (Exception ex) {
