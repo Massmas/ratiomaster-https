@@ -39,6 +39,6 @@ jobs:
 
             ### Install
             Download `RatioMaster.exe` below and run it directly — no installation needed.
-          files: RatioMaster/bin/RatioMaster.exe
+          files: RatioMaster/bin/**/RatioMaster.exe
           draft: false
           prerelease: false
