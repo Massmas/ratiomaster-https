@@ -741,7 +741,7 @@ namespace RatioMaster
       this.fileSize.Name = "fileSize";
       this.fileSize.Size = new System.Drawing.Size(48, 20);
       this.fileSize.TabIndex = 20;
-      this.fileSize.Text = "0";
+      this.fileSize.Text = "100";
       // 
       // cmbVersion
       // 

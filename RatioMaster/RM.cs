@@ -756,7 +756,7 @@ namespace RatioMaster {
       var defd = (int) (torrent.downloadRate / 1024);
       uploadRate.Text = defup.ToString();
       downloadRate.Text = defd.ToString();
-      fileSize.Text = "0";
+      fileSize.Text = "100";
       interval.Text = torrent.interval.ToString();
 
       // Random speeds
@@ -1646,7 +1646,7 @@ namespace RatioMaster {
         cmbVersion.SelectedItem = reg.GetValue("ClientVersion", DefaultClientVersion);
         uploadRate.Text = (string) reg.GetValue("UploadRate", uploadRate.Text);
         downloadRate.Text = (string) reg.GetValue("DownloadRate", downloadRate.Text);
-        fileSize.Text = (string) reg.GetValue("fileSize", "0");
+        fileSize.Text = (string) reg.GetValue("fileSize", "100");
 
         // fileSize.Text = "0";
         interval.Text = reg.GetValue("Interval", interval.Text).ToString();
