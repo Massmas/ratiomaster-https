@@ -16,22 +16,6 @@
     <Deterministic>false</Deterministic>
   </PropertyGroup>
 
-  <!-- Exclude old WinForms-only files -->
-  <ItemGroup>
-    <Compile Remove="MainForm.cs" />
-    <Compile Remove="MainForm.Designer.cs" />
-    <Compile Remove="Prompt.cs" />
-    <Compile Remove="Prompt.Designer.cs" />
-    <Compile Remove="Program.cs" />
-    <Compile Remove="RM.cs" />
-    <Compile Remove="RM.Designer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="MainForm.resx" />
-    <EmbeddedResource Remove="Prompt.resx" />
-    <EmbeddedResource Remove="RM.resx" />
-  </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\Main.ico" />
   </ItemGroup>
