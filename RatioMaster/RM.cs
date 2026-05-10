@@ -21,6 +21,8 @@ namespace RatioMaster {
 
     private bool getnew = true;
     private readonly Random rand = new Random((int) DateTime.Now.Ticks);
+    private long _nextAnnounceUploadRate  = -1;
+    private long _nextAnnounceDownloadRate = -1;
     private int remWork;
     internal string DefaultDirectory = "";
     private const string DefaultClient = "uTorrent";
@@ -515,12 +517,11 @@ namespace RatioMaster {
       torrent.tracker = trackerAddress.Text;
       torrent.trackerUri = trackerUri;
       torrent.hash = shaHash.Text;
-      torrent.uploadRate = (Int64) (uploadRate.Text.ParseValidFloat(50) * 1024);
+      torrent.uploadRate = _nextAnnounceUploadRate >= 0 ? _nextAnnounceUploadRate : (Int64)(uploadRate.Text.ParseValidFloat(50) * 1024);
+      _nextAnnounceUploadRate = -1;
 
-      // uploadRate.Text = (torrent.uploadRate / (float)1024).ToString();
-      torrent.downloadRate = (Int64) (downloadRate.Text.ParseValidFloat(10) * 1024);
-
-      // downloadRate.Text = (torrent.downloadRate / (float)1024).ToString();
+      torrent.downloadRate = _nextAnnounceDownloadRate >= 0 ? _nextAnnounceDownloadRate : (Int64)(downloadRate.Text.ParseValidFloat(10) * 1024);
+      _nextAnnounceDownloadRate = -1;
       torrent.interval = interval.Text.ParseValidInt(torrent.interval);
       interval.Text = torrent.interval.ToString();
       var finishedPercent = fileSize.Text.ParseDouble(0);
@@ -1204,15 +1205,12 @@ namespace RatioMaster {
     internal void RandomiseSpeeds() {
       try {
         if (checkRandomUpload.Checked) {
-          uploadRate.Text = (RandomSp(RandomUploadFrom.Text, RandomUploadTo.Text, true) / 1024).ToString();
-
-          // uploadRate.Text = ((int)random1.Next(int.Parse(RandomUploadFrom.Text), int.Parse(RandomUploadTo.Text)) + (int)single1).ToString();
+          _nextAnnounceUploadRate = RandomSp(RandomUploadFrom.Text, RandomUploadTo.Text, true);
+          AddLogLine("Next announce upload (random): " + _nextAnnounceUploadRate / 1024 + " kB/s");
         }
-
         if (checkRandomDownload.Checked) {
-          downloadRate.Text = (RandomSp(RandomDownloadFrom.Text, RandomDownloadTo.Text, true) / 1024).ToString();
-
-          // downloadRate.Text = ((int)random1.Next(int.Parse(RandomDownloadFrom.Text), int.Parse(RandomDownloadTo.Text)) + (int)single2).ToString();
+          _nextAnnounceDownloadRate = RandomSp(RandomDownloadFrom.Text, RandomDownloadTo.Text, true);
+          AddLogLine("Next announce download (random): " + _nextAnnounceDownloadRate / 1024 + " kB/s");
         }
       }
       catch (Exception exception1) {
