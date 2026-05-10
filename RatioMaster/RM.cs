@@ -54,7 +54,6 @@ namespace RatioMaster {
       InitializeComponent();
       deployDefaultValues();
       ApplyDarkTheme();
-      GetPCinfo();
       ReadSettings();
     }
 
@@ -261,23 +260,6 @@ namespace RatioMaster {
       }
     }
 
-    internal void GetPCinfo() {
-      try {
-        AddLogLine("CurrentDirectory: " + Environment.CurrentDirectory);
-        AddLogLine("HasShutdownStarted: " + Environment.HasShutdownStarted);
-        AddLogLine("MachineName: " + Environment.MachineName);
-        AddLogLine("OSVersion: " + Environment.OSVersion);
-        AddLogLine("ProcessorCount: " + Environment.ProcessorCount);
-        AddLogLine("UserDomainName: " + Environment.UserDomainName);
-        AddLogLine("UserInteractive: " + Environment.UserInteractive);
-        AddLogLine("UserName: " + Environment.UserName);
-        AddLogLine("Version: " + Environment.Version);
-        AddLogLine("WorkingSet: " + Environment.WorkingSet);
-        AddLogLine("");
-      }
-      catch (Exception) {
-      }
-    }
 
     #endregion
 
@@ -1450,10 +1432,14 @@ namespace RatioMaster {
       return curProxy;
     }
 
-    private TrackerResponse MakeWebRequestEx(Uri reqUri) {
+    private TrackerResponse MakeWebRequestEx(Uri reqUri, int redirectDepth = 0) {
+      if (redirectDepth > 5) {
+        AddLogLine("Error: too many redirects, aborting");
+        return null;
+      }
       var isHttps = reqUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
       if (isHttps && currentProxy.ProxyType == ProxyType.None) {
-        return MakeHttpsRequest(reqUri);
+        return MakeHttpsRequest(reqUri, redirectDepth);
       }
 
       var usedEnc = Encoding.GetEncoding(0x4e4);
@@ -1506,7 +1492,7 @@ namespace RatioMaster {
 
           trackerResponse = new TrackerResponse(memStream);
           if (trackerResponse.doRedirect) {
-            return MakeWebRequestEx(new Uri(trackerResponse.RedirectionURL));
+            return MakeWebRequestEx(new Uri(trackerResponse.RedirectionURL), redirectDepth + 1);
           }
 
           AddLogLine("======== Tracker Response ========");
@@ -1532,7 +1518,7 @@ namespace RatioMaster {
       }
     }
 
-    private TrackerResponse MakeHttpsRequest(Uri reqUri) {
+    private TrackerResponse MakeHttpsRequest(Uri reqUri, int redirectDepth = 0) {
       var usedEnc = Encoding.GetEncoding(0x4e4);
       var host = reqUri.Host;
       var port = reqUri.Port;
@@ -1598,7 +1584,7 @@ namespace RatioMaster {
 
         var trackerResponse = new TrackerResponse(memStream);
         if (trackerResponse.doRedirect) {
-          return MakeWebRequestEx(new Uri(trackerResponse.RedirectionURL));
+          return MakeWebRequestEx(new Uri(trackerResponse.RedirectionURL), redirectDepth + 1);
         }
 
         AddLogLine("======== Tracker Response ========");
