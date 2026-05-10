@@ -53,8 +53,107 @@ namespace RatioMaster {
     internal RM() {
       InitializeComponent();
       deployDefaultValues();
+      ApplyDarkTheme();
       GetPCinfo();
       ReadSettings();
+    }
+
+    private void ApplyDarkTheme() {
+      var bg       = Color.FromArgb(30,  30,  30);
+      var panelBg  = Color.FromArgb(37,  37,  38);
+      var inputBg  = Color.FromArgb(55,  55,  58);
+      var text     = Color.FromArgb(220, 220, 220);
+      var accent   = Color.FromArgb(86,  156, 214);
+      var green    = Color.FromArgb(22,  130,  93);
+      var red      = Color.FromArgb(176,  24,   4);
+      var blue     = Color.FromArgb(14,   99, 156);
+      var grayBtn  = Color.FromArgb(58,   58,  60);
+      var btnFont  = new Font("Segoe UI", 9F, FontStyle.Bold);
+      var ctrlFont = new Font("Segoe UI", 8.5F);
+
+      this.BackColor = bg;
+
+      logWindow.BackColor = bg;
+      logWindow.ForeColor = text;
+      logWindow.Font = new Font("Consolas", 9F);
+
+      tabControl.BackColor  = panelBg;
+      tabPageMain.BackColor = panelBg;
+      tabPageAdvanced.BackColor = panelBg;
+
+      panelControls.BackColor = panelBg;
+
+      info.BackColor = Color.FromArgb(0, 122, 204);
+      info.ForeColor = Color.White;
+      foreach (ToolStripItem item in info.Items) {
+        item.BackColor = Color.FromArgb(0, 122, 204);
+        item.ForeColor = Color.White;
+      }
+
+      void StyleButton(Button b, Color bg2, Color fg) {
+        b.BackColor = bg2;
+        b.ForeColor = fg;
+        b.FlatStyle = FlatStyle.Flat;
+        b.FlatAppearance.BorderSize = 1;
+        b.FlatAppearance.BorderColor = Color.FromArgb(Math.Min(bg2.R + 30, 255), Math.Min(bg2.G + 30, 255), Math.Min(bg2.B + 30, 255));
+        b.Font = btnFont;
+        b.UseVisualStyleBackColor = false;
+      }
+      StyleButton(StartButton,       green,   Color.White);
+      StyleButton(StopButton,        red,     Color.White);
+      StyleButton(manualUpdateButton, blue,   Color.White);
+      StyleButton(btnDefault,        grayBtn, text);
+      StyleButton(browseButton,      grayBtn, text);
+
+      foreach (var gb in new[] { groupBox1, groupBox2, groupBox3, groupBox4, groupBox5, groupBox6, groupBox7, groupBox8 }) {
+        gb.BackColor = panelBg;
+        gb.ForeColor = accent;
+        gb.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+      }
+
+      void ThemeControls(Control.ControlCollection cc) {
+        foreach (Control c in cc) {
+          switch (c) {
+            case TextBox tb:
+              tb.BackColor = inputBg;
+              tb.ForeColor = text;
+              tb.BorderStyle = BorderStyle.FixedSingle;
+              tb.Font = ctrlFont;
+              break;
+            case ComboBox cb:
+              cb.BackColor = inputBg;
+              cb.ForeColor = text;
+              cb.Font = ctrlFont;
+              break;
+            case Label lbl:
+              lbl.ForeColor = text;
+              lbl.BackColor = Color.Transparent;
+              lbl.Font = ctrlFont;
+              break;
+            case CheckBox chk:
+              chk.ForeColor = text;
+              chk.BackColor = Color.Transparent;
+              chk.Font = ctrlFont;
+              break;
+          }
+          if (c.HasChildren) ThemeControls(c.Controls);
+        }
+      }
+      ThemeControls(tabPageMain.Controls);
+      ThemeControls(tabPageAdvanced.Controls);
+    }
+
+    private static Color GetLogColor(string line) {
+      var lower = line.ToLowerInvariant();
+      if (lower.Contains("error") || lower.Contains("exception") || lower.Contains("failed") || lower.Contains("stopped because"))
+        return Color.FromArgb(244, 71, 71);
+      if (lower.Contains("started") || lower.Contains("success") || lower.Contains("complete") || lower.Contains("finished"))
+        return Color.FromArgb(78, 201, 160);
+      if (lower.Contains("tracker") || lower.Contains("peers") || lower.Contains("scrape") || lower.Contains("https") || lower.Contains("connecting"))
+        return Color.FromArgb(220, 220, 170);
+      if (lower.Contains("torrent info") || lower.Contains("client emulation") || lower.Contains("upload") || lower.Contains("download") || lower.Contains("interval") || lower.Contains("ratio"))
+        return Color.FromArgb(156, 220, 254);
+      return Color.FromArgb(212, 212, 212);
     }
 
     internal void Form1_DragDrop(object sender, DragEventArgs e) {
@@ -145,16 +244,16 @@ namespace RatioMaster {
       else {
         try {
           var dtNow = DateTime.Now;
-          string dateString;
+          string dateString = !MainForm._24h_format_enabled
+            ? "[" + String.Format("{0:hh:mm:ss}", dtNow) + "]"
+            : "[" + String.Format("{0:HH:mm:ss}", dtNow) + "]";
 
-          if (!MainForm._24h_format_enabled)
-            dateString = "[" + String.Format("{0:hh:mm:ss}", dtNow) + "]";
-          else
-            dateString = "[" + String.Format("{0:HH:mm:ss}", dtNow) + "]";
-
+          var color = GetLogColor(logLine);
+          logWindow.SelectionStart = logWindow.TextLength;
+          logWindow.SelectionLength = 0;
+          logWindow.SelectionColor = color;
           logWindow.AppendText(dateString + " " + logLine + "\r\n");
-
-          // logWindow.SelectionStart = logWindow.Text.Length;
+          logWindow.SelectionColor = logWindow.ForeColor;
           logWindow.ScrollToCaret();
         }
         catch (Exception) {

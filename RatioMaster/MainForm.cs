@@ -48,7 +48,8 @@ namespace RatioMaster {
       menu.Renderer = new ThemedToolStripRenderer();
       menuRightClickTray.Renderer = new ThemedToolStripRenderer();
 
-      Theme.Current = new LightTheme();
+      Theme.Current = new DarkTheme();
+      Theme.Current.Apply(this);
       themeMenuItem.Visible = false;
       return;
 
