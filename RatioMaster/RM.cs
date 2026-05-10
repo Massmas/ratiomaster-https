@@ -53,93 +53,39 @@ namespace RatioMaster {
     internal RM() {
       InitializeComponent();
       deployDefaultValues();
-      ApplyDarkTheme();
+      ApplyModernButtons();
       ReadSettings();
     }
 
-    private void ApplyDarkTheme() {
-      var bg       = Color.FromArgb(30,  30,  30);
-      var panelBg  = Color.FromArgb(37,  37,  38);
-      var inputBg  = Color.FromArgb(55,  55,  58);
-      var text     = Color.FromArgb(220, 220, 220);
-      var accent   = Color.FromArgb(86,  156, 214);
-      var green    = Color.FromArgb(22,  130,  93);
-      var red      = Color.FromArgb(176,  24,   4);
-      var blue     = Color.FromArgb(14,   99, 156);
-      var grayBtn  = Color.FromArgb(58,   58,  60);
-      var btnFont  = new Font("Segoe UI", 9F, FontStyle.Bold);
-      var ctrlFont = new Font("Segoe UI", 8.5F);
+    private void ApplyModernButtons() {
+      var btnFont = new Font("Segoe UI", 9F, FontStyle.Bold);
 
-      this.BackColor = bg;
-
-      logWindow.BackColor = bg;
-      logWindow.ForeColor = text;
-      logWindow.Font = new Font("Consolas", 9F);
-
-      tabControl.BackColor  = panelBg;
-      tabPageMain.BackColor = panelBg;
-      tabPageAdvanced.BackColor = panelBg;
-
-      panelControls.BackColor = panelBg;
-
-      info.BackColor = Color.FromArgb(0, 122, 204);
-      info.ForeColor = Color.White;
-      foreach (ToolStripItem item in info.Items) {
-        item.BackColor = Color.FromArgb(0, 122, 204);
-        item.ForeColor = Color.White;
-      }
-
-      void StyleButton(Button b, Color bg2, Color fg) {
-        b.BackColor = bg2;
+      void StyleBtn(Button b, Color bg, Color fg, Color border) {
+        b.BackColor = bg;
         b.ForeColor = fg;
         b.FlatStyle = FlatStyle.Flat;
+        b.FlatAppearance.BorderColor = border;
         b.FlatAppearance.BorderSize = 1;
-        b.FlatAppearance.BorderColor = Color.FromArgb(Math.Min(bg2.R + 30, 255), Math.Min(bg2.G + 30, 255), Math.Min(bg2.B + 30, 255));
         b.Font = btnFont;
         b.UseVisualStyleBackColor = false;
       }
-      StyleButton(StartButton,       green,   Color.White);
-      StyleButton(StopButton,        red,     Color.White);
-      StyleButton(manualUpdateButton, blue,   Color.White);
-      StyleButton(btnDefault,        grayBtn, text);
-      StyleButton(browseButton,      grayBtn, text);
 
-      foreach (var gb in new[] { groupBox1, groupBox2, groupBox3, groupBox4, groupBox5, groupBox6, groupBox7, groupBox8 }) {
-        gb.BackColor = panelBg;
-        gb.ForeColor = accent;
-        gb.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-      }
+      StyleBtn(StartButton,        Color.FromArgb(39, 174, 96),  Color.White, Color.FromArgb(30, 150, 80));
+      StyleBtn(StopButton,         Color.FromArgb(192, 57, 43),  Color.White, Color.FromArgb(160, 40, 30));
+      StyleBtn(manualUpdateButton, Color.FromArgb(41, 128, 185), Color.White, Color.FromArgb(30, 100, 160));
+      StyleBtn(btnDefault,         Color.FromArgb(236, 240, 241), Color.FromArgb(44, 62, 80), Color.FromArgb(189, 195, 199));
+      StyleBtn(browseButton,       Color.FromArgb(236, 240, 241), Color.FromArgb(44, 62, 80), Color.FromArgb(189, 195, 199));
 
-      void ThemeControls(Control.ControlCollection cc) {
-        foreach (Control c in cc) {
-          switch (c) {
-            case TextBox tb:
-              tb.BackColor = inputBg;
-              tb.ForeColor = text;
-              tb.BorderStyle = BorderStyle.FixedSingle;
-              tb.Font = ctrlFont;
-              break;
-            case ComboBox cb:
-              cb.BackColor = inputBg;
-              cb.ForeColor = text;
-              cb.Font = ctrlFont;
-              break;
-            case Label lbl:
-              lbl.ForeColor = text;
-              lbl.BackColor = Color.Transparent;
-              lbl.Font = ctrlFont;
-              break;
-            case CheckBox chk:
-              chk.ForeColor = text;
-              chk.BackColor = Color.Transparent;
-              chk.Font = ctrlFont;
-              break;
-          }
-          if (c.HasChildren) ThemeControls(c.Controls);
-        }
+      logWindow.BackColor = Color.FromArgb(15, 15, 25);
+      logWindow.ForeColor = Color.FromArgb(200, 200, 200);
+      logWindow.Font = new Font("Consolas", 9F);
+
+      info.BackColor = Color.FromArgb(44, 62, 80);
+      info.ForeColor = Color.White;
+      foreach (ToolStripItem item in info.Items) {
+        item.BackColor = Color.FromArgb(44, 62, 80);
+        item.ForeColor = Color.White;
       }
-      ThemeControls(tabPageMain.Controls);
-      ThemeControls(tabPageAdvanced.Controls);
     }
 
     private static Color GetLogColor(string line) {
