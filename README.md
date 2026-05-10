@@ -13,6 +13,8 @@ Supported clients: uTorrent, BitComet, Azureus, ABC, BitLord, BTuga, BitTornado,
 ## What's new in this fork
 
 - **Native HTTPS support** — the original used raw TCP sockets which failed on HTTPS-only trackers (e.g. Cloudflare-protected). This fork uses `SslStream` with proper TLS handshake and `Connection: close` to correctly communicate with HTTPS trackers.
+- **Modernised UI** — fully rewritten in WPF with a dark/light theme toggle, adaptive log window, responsive title bar buttons, and improved contrast throughout.
+- **Seeding fix** — announces start even when the tracker returns an empty peer list.
 
 ## Build
 
