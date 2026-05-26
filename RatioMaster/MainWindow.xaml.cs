@@ -304,21 +304,24 @@ namespace RatioMaster {
       doc.Save(path);
     }
 
-    private void ClearAllTabs() {
-      foreach (TabItem t in tabControl.Items)
-        (t.Content as RMView)?.StopButton_Click(null, null);
-      tabControl.Items.Clear();
-      data.Clear();
-      items = 0;
-      allit = 0;
-      lblTabs.Text = "0";
+    private void ClearIdleTabs() {
+      var toRemove = new System.Collections.Generic.List<TabItem>();
+      foreach (TabItem t in tabControl.Items) {
+        var rm = t.Content as RMView;
+        if (rm == null || !rm.IsRunning) toRemove.Add(t);
+      }
+      foreach (var t in toRemove) {
+        tabControl.Items.Remove(t);
+        items--;
+      }
+      lblTabs.Text = allit.ToString();
     }
 
     private void LoadSessionFromFile(string path) {
       var doc = new XmlDocument();
       doc.Load(path);
       XmlNode root = doc.DocumentElement;
-      ClearAllTabs();
+      ClearIdleTabs();
       foreach (XmlNode node in root.ChildNodes) {
         AddTab("");
         var tab = tabControl.SelectedItem as TabItem;
