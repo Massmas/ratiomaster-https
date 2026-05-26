@@ -304,26 +304,27 @@ namespace RatioMaster {
       doc.Save(path);
     }
 
-    private string UniqueTabName(string baseName) {
-      var existing = new System.Collections.Generic.HashSet<string>();
+    private void ClearAllTabs() {
       foreach (TabItem t in tabControl.Items)
-        existing.Add(t.Header?.ToString() ?? "");
-      if (!existing.Contains(baseName)) return baseName;
-      int i = 2;
-      while (existing.Contains(baseName + " (" + i + ")")) i++;
-      return baseName + " (" + i + ")";
+        (t.Content as RMView)?.StopButton_Click(null, null);
+      tabControl.Items.Clear();
+      data.Clear();
+      items = 0;
+      allit = 0;
+      lblTabs.Text = "0";
     }
 
     private void LoadSessionFromFile(string path) {
       var doc = new XmlDocument();
       doc.Load(path);
       XmlNode root = doc.DocumentElement;
+      ClearAllTabs();
       foreach (XmlNode node in root.ChildNodes) {
         AddTab("");
         var tab = tabControl.SelectedItem as TabItem;
         var rm = tab?.Content as RMView;
         if (rm == null || tab == null) continue;
-        tab.Header = UniqueTabName(node["Name"]?.InnerText ?? "RM");
+        tab.Header = node["Name"]?.InnerText ?? "RM";
         rm.torrentFile.Text = node["Address"]?.InnerText ?? "";
         if (!string.IsNullOrEmpty(rm.torrentFile.Text))
           rm.LoadTorrentFileInfo(rm.torrentFile.Text);
