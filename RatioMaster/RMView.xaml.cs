@@ -979,9 +979,11 @@ namespace RatioMaster {
 
     private TrackerResponse MakeWebRequestEx(Uri reqUri, int redirectDepth = 0) {
       if (redirectDepth > 5) { AddLogLine("Error: too many redirects, aborting"); return null; }
-      if (reqUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase) &&
-          currentProxy.ProxyType == ProxyType.None)
+      if (reqUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase)) {
+        // ponytail: no TLS over proxy tunnel yet; refuse rather than send the passkey in clear
+        if (currentProxy.ProxyType != ProxyType.None) { AddLogLine("Error: HTTPS trackers are not supported through a proxy"); return null; }
         return MakeHttpsRequest(reqUri, redirectDepth);
+      }
 
       var enc  = Encoding.GetEncoding(0x4e4);
       SocketEx sock = null;
@@ -1031,7 +1033,7 @@ namespace RatioMaster {
         }
         if (!connected) { AddLogLine("Could not connect after 5 attempts"); return null; }
         var netStream = tcp.GetStream(); netStream.ReadTimeout = 15000;
-        ssl = new SslStream(netStream, false, (s, c, ch, e2) => true);
+        ssl = new SslStream(netStream, false);
         ssl.AuthenticateAsClient(host);
         var headers = currentClient.Headers.Replace("{host}", host);
         if (!headers.Contains("Connection:")) headers += "Connection: close\r\n";

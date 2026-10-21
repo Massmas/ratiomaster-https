@@ -40,6 +40,7 @@ jobs:
             - Native HTTPS support via SslStream (fixes Cloudflare-protected trackers)
             - Modernised UI — WPF dark/light theme, adaptive log window, responsive title bar
             - Seeding fix — announces start even when the tracker returns an empty peer list
+            - Security — tracker TLS certificates are verified; HTTPS through a proxy is refused instead of leaking the passkey in clear
 
             ### Install
             Download `RatioMaster.exe` below and run it directly — no installation needed.
