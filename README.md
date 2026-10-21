@@ -15,7 +15,18 @@ Supported clients: uTorrent, BitComet, Azureus, ABC, BitLord, BTuga, BitTornado,
 - **Native HTTPS support** — the original used raw TCP sockets which failed on HTTPS-only trackers (e.g. Cloudflare-protected). This fork uses `SslStream` with proper TLS handshake and `Connection: close` to correctly communicate with HTTPS trackers.
 - **Modernised UI** — fully rewritten in WPF with a dark/light theme toggle, adaptive log window, responsive title bar buttons, and improved contrast throughout.
 - **Seeding fix** — announces start even when the tracker returns an empty peer list.
-- **Security** — tracker TLS certificates are verified (your passkey can't be sniffed by a man-in-the-middle), proxy passwords and PC info are no longer written to the log.
+- **Security** — see below.
+
+## Differences from upstream
+
+| | sergiye/RatioMaster | This fork |
+|---|---|---|
+| HTTPS trackers | Not supported | Supported, TLS certificate verified |
+| PC name, user name and OS version in the log | Written | Not written |
+| Proxy password in the log | Written in clear | Not written |
+| UI | WinForms | WPF, dark/light theme |
+
+Logs are often pasted on forums when asking for help, so they should not contain personal data or passwords.
 
 ## Download
 
