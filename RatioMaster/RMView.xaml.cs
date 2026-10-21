@@ -980,7 +980,7 @@ namespace RatioMaster {
     private TrackerResponse MakeWebRequestEx(Uri reqUri, int redirectDepth = 0) {
       if (redirectDepth > 5) { AddLogLine("Error: too many redirects, aborting"); return null; }
       if (reqUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase)) {
-        // ponytail: no TLS over proxy tunnel yet; refuse rather than send the passkey in clear
+        // No TLS over a proxy tunnel yet: refuse rather than send the passkey in clear
         if (currentProxy.ProxyType != ProxyType.None) { AddLogLine("Error: HTTPS trackers are not supported through a proxy"); return null; }
         return MakeHttpsRequest(reqUri, redirectDepth);
       }
