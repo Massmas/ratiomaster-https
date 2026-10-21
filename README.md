@@ -21,12 +21,10 @@ Supported clients: uTorrent, BitComet, Azureus, ABC, BitLord, BTuga, BitTornado,
 
 | | sergiye/RatioMaster | This fork |
 |---|---|---|
-| HTTPS trackers | Not supported | Supported, TLS certificate verified |
-| PC name, user name and OS version in the log | Written | Not written |
-| Proxy password in the log | Written in clear | Not written |
+| HTTPS trackers | Not supported ([proposed upstream](https://github.com/sergiye/RatioMaster/pull/6)) | Supported, TLS certificate verified |
 | UI | WinForms | WPF, dark/light theme |
 
-Logs are often pasted on forums when asking for help, so they should not contain personal data or passwords.
+The fork also stopped writing the user/machine names and the proxy password to the log; that fix has been [merged upstream](https://github.com/sergiye/RatioMaster/pull/5).
 
 ## Download
 
