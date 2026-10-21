@@ -972,8 +972,7 @@ namespace RatioMaster {
       AddLogLine("proxyType = "     + proxy.ProxyType);
       AddLogLine("proxyServer = "   + proxy.ProxyServer);
       AddLogLine("proxyPort = "     + proxy.ProxyPort);
-      AddLogLine("proxyUser = "     + Encoding.ASCII.GetString(proxy.ProxyUser));
-      AddLogLine("proxyPassword = " + Encoding.ASCII.GetString(proxy.ProxyPassword) + "\n\n");
+      AddLogLine("proxyUser = "     + Encoding.ASCII.GetString(proxy.ProxyUser) + "\n\n");
       return proxy;
     }
 
